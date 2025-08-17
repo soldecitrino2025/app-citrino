@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOL DE CITRINO - Gestor de Pedidos</title>
+    <!-- Tailwind CSS para estilos rápidos y responsivos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuentes para un diseño más estético -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Definiciones de colores y fuentes personalizadas */
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .bg-zinc-900 { background-color: #18181b; }
+        .bg-zinc-800 { background-color: #27272a; }
+        .bg-zinc-700 { background-color: #3f3f46; }
+        .text-zinc-100 { color: #f4f4f5; }
+        .text-zinc-200 { color: #e4e4e7; }
+        .text-zinc-300 { color: #d4d4d8; }
+        .text-zinc-400 { color: #a1a1aa; }
+        .text-zinc-500 { color: #71717a; }
+        .bg-amber-500 { background-color: #f59e0b; }
+        .hover-bg-amber-600:hover { background-color: #d97706; }
+        .text-amber-400 { color: #facc15; }
+        .border-amber-400 { border-color: #facc15; }
+        .ring-amber-400 { --tw-ring-color: #facc15; }
+        .bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.1); }
+        .border-amber-500\/20 { border-color: rgba(245, 158, 11, 0.2); }
+    </style>
+</head>
+<body class="bg-zinc-900 text-zinc-100 antialiased">
+
+    <!-- Contenedor principal de la aplicación -->
+    <div class="max-w-6xl mx-auto p-4 sm:p-8 md:p-12 space-y-8">
+        
+        <!-- Encabezado -->
+        <header class="bg-zinc-800 rounded-2xl shadow-lg p-6 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold font-serif text-amber-400">
+                Gestor de Pedidos
+            </h1>
+            <h2 class="text-xl sm:text-2xl font-bold font-serif text-amber-400 mb-2">
+                SOL DE CITRINO
+            </h2>
+            <p class="text-zinc-400 text-xs sm:text-sm flex items-center justify-center gap-2">
+                ID de Usuario: <span id="user-id" class="font-mono break-all">Cargando...</span>
+                <button id="copy-btn" class="text-amber-400 hover:text-amber-500 focus:outline-none" title="Copiar ID de Usuario">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                </button>
+            </p>
+        </header>
+
+        <!-- Sección de Total de Ventas -->
+        <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 text-center border-l-4 border-amber-400">
+            <h2 class="text-xl sm:text-2xl font-bold font-serif text-zinc-100">
+                Monto Total de Ventas
+            </h2>
+            <p id="total-ventas" class="text-3xl sm:text-4xl font-extrabold text-amber-400 mt-2">
+                $0.00
+            </p>
+        </div>
+
+        <!-- Secciones de la aplicación -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Columna de Cargar Pedido -->
+            <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 space-y-6">
+                <h2 class="text-2xl font-bold font-serif text-zinc-100 border-b-2 border-zinc-700 pb-2">
+                    Cargar Nuevo Pedido
+                </h2>
+                
+                <!-- Formulario para el cliente -->
+                <div class="space-y-4">
+                    <label for="nombre-cliente" class="block text-zinc-300 font-medium">
+                        Nombre del Cliente:
+                    </label>
+                    <input id="nombre-cliente" type="text" placeholder="Ej. Juan Pérez" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
+                </div>
+
+                <!-- Formulario para agregar productos al pedido -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-zinc-200">Agregar Productos</h3>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input id="prod-nombre" type="text" placeholder="Producto" class="w-full sm:w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
+                        <input id="prod-precio" type="number" placeholder="Precio" class="w-full sm:w-1/4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
+                        <input id="prod-cantidad" type="number" placeholder="Cantidad" value="1" min="1" class="w-full sm:w-1/4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
+                    </div>
+                    <button id="btn-agregar-producto" class="w-full bg-amber-500 text-zinc-900 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-amber-600 transition duration-300">
+                        + Agregar a la lista
+                    </button>
+                </div>
+
+                <!-- Lista de productos en el pedido actual -->
+                <div id="productos-en-pedido" class="space-y-2 p-4 bg-zinc-700 rounded-lg border border-zinc-600 hidden">
+                    <h3 class="text-lg font-semibold text-zinc-100">Productos en el pedido:</h3>
+                    <ul id="lista-items-pedido" class="list-disc list-inside">
+                        <!-- Los productos se agregarán aquí dinámicamente -->
+                    </ul>
+                </div>
+
+                <!-- Botón para crear el pedido -->
+                <button id="btn-crear-pedido" class="w-full font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 bg-zinc-700 text-zinc-500 cursor-not-allowed" disabled>
+                    Crear Pedido
+                </button>
+            </div>
+
+            <!-- Columna de Pedidos Pendientes -->
+            <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 space-y-6">
+                <h2 class="text-2xl font-bold font-serif text-zinc-100 border-b-2 border-zinc-700 pb-2">
+                    Pedidos Pendientes
+                </h2>
+                <div id="pedidos-pendientes-container">
+                    <p class="text-center text-zinc-500 italic">No hay pedidos pendientes.</p>
+                </div>
+            </div>
+
+            <!-- Columna de Pedidos Completados -->
+            <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 space-y-6">
+                <h2 class="text-2xl font-bold font-serif text-zinc-100 border-b-2 border-zinc-700 pb-2">
+                    Historial de Pedidos
+                </h2>
+                <div id="pedidos-completados-container">
+                    <p class="text-center text-zinc-500 italic">No hay pedidos completados.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script de Firebase y lógica de la aplicación -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, updateDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // =================================================================
+        // ATENCIÓN: CONFIGURACIÓN DE FIREBASE
+        // Reemplaza los valores con la configuración de tu propio proyecto de Firebase.
+        // Puedes encontrarla en la Consola de Firebase > Configuración del proyecto.
+        // =================================================================
+        const firebaseConfig = {
+          aapiKey: "AIzaSyA222Jgj6QZVJkweieKdfx1yNdbdlIN9hU",
+          authDomain: "sol-de-citrino-9147e.firebaseapp.com",
+          projectId: "sol-de-citrino-9147e",
+          storageBucket: "sol-de-citrino-9147e.firebasestorage.app",
+          messagingSenderId: "341941938811",
+          appId: "1:341941938811:web:cb6a18f5045113baa750de"
+        };
+        
+        let db, auth;
+        let userId = null;
+        let itemsPedido = [];
+
+        // Inicializar Firebase
+        const initFirebase = () => {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                signInAnonymously(auth); // Autenticación anónima para acceso compartido
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        document.getElementById('user-id').textContent = userId;
+                        setupRealtimeListener();
+                    } else {
+                        document.getElementById('user-id').textContent = 'No autenticado';
+                    }
+                });
+            } catch (error) {
+                console.error("Error al inicializar Firebase:", error);
+                document.getElementById('user-id').textContent = 'Error de inicialización';
+            }
+        };
+
+        // Escuchar cambios en la base de datos en tiempo real
+        const setupRealtimeListener = () => {
+            const pedidosRef = collection(db, 'pedidos_compartidos');
+            const q = query(pedidosRef);
+
+            onSnapshot(q, (snapshot) => {
+                const pedidosData = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                renderPedidos(pedidosData);
+            }, (error) => {
+                console.error("Error al escuchar los pedidos:", error);
+            });
+        };
+
+        // Renderizar los pedidos en la UI
+        const renderPedidos = (pedidos) => {
+            const pendientesContainer = document.getElementById('pedidos-pendientes-container');
+            const completadosContainer = document.getElementById('pedidos-completados-container');
+            const totalVentasEl = document.getElementById('total-ventas');
+
+            let pedidosPendientesHTML = '';
+            let pedidosCompletadosHTML = '';
+            let totalVentas = 0;
+
+            pedidos.forEach(pedido => {
+                if (pedido.pagado && pedido.entregado) {
+                    totalVentas += pedido.total;
+                    pedidosCompletadosHTML += `
+                        <li class="bg-amber-500/10 rounded-lg p-4 shadow-sm border border-amber-500/20">
+                            <p class="text-lg font-bold text-amber-400">Cliente: ${pedido.cliente}</p>
+                            <p class="text-sm text-zinc-300">Total: $${pedido.total.toFixed(2)}</p>
+                            <p class="text-xs text-zinc-500 mt-1">
+                                Completado el: ${new Date(pedido.fecha).toLocaleDateString()}
+                            </p>
+                        </li>
+                    `;
+                } else {
+                    const productosHTML = pedido.productos.map(prod => `
+                        <li>${prod.cantidad} x ${prod.nombre} ($${prod.precio.toFixed(2)})</li>
+                    `).join('');
+
+                    pedidosPendientesHTML += `
+                        <li class="bg-zinc-700 rounded-lg p-4 shadow-sm border border-zinc-600">
+                            <p class="text-lg font-bold text-zinc-100">Cliente: ${pedido.cliente}</p>
+                            <p class="text-sm text-zinc-400">Total: $${pedido.total.toFixed(2)}</p>
+                            <ul class="list-disc list-inside mt-2 text-sm text-zinc-300">
+                                ${productosHTML}
+                            </ul>
+                            <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                                <button onclick="marcarPagado('${pedido.id}', ${pedido.pagado})" class="w-full py-2 px-4 rounded-lg font-semibold transition duration-300 ${pedido.pagado ? 'bg-amber-500 text-zinc-900' : 'bg-zinc-600 text-zinc-300 hover:bg-amber-400 hover:text-zinc-900'}">
+                                    ${pedido.pagado ? '✓ Pagado' : 'Pagado'}
+                                </button>
+                                <button onclick="marcarEntregado('${pedido.id}', ${pedido.entregado})" class="w-full py-2 px-4 rounded-lg font-semibold transition duration-300 ${pedido.entregado ? 'bg-amber-500 text-zinc-900' : 'bg-zinc-600 text-zinc-300 hover:bg-amber-400 hover:text-zinc-900'}">
+                                    ${pedido.entregado ? '✓ Entregado' : 'Entregado'}
+                                </button>
+                            </div>
+                        </li>
+                    `;
+                }
+            });
+
+            pendientesContainer.innerHTML = pedidosPendientesHTML || '<p class="text-center text-zinc-500 italic">No hay pedidos pendientes.</p>';
+            completadosContainer.innerHTML = pedidosCompletadosHTML || '<p class="text-center text-zinc-500 italic">No hay pedidos completados.</p>';
+            totalVentasEl.textContent = `$${totalVentas.toFixed(2)}`;
+        };
+
+        // Funciones de manejo de eventos
+        document.getElementById('btn-agregar-producto').addEventListener('click', () => {
+            const nombre = document.getElementById('prod-nombre').value;
+            const precio = document.getElementById('prod-precio').value;
+            const cantidad = document.getElementById('prod-cantidad').value;
+
+            if (nombre && precio && cantidad > 0) {
+                const nuevoProducto = {
+                    nombre: nombre,
+                    precio: parseFloat(precio),
+                    cantidad: parseInt(cantidad),
+                };
+                itemsPedido.push(nuevoProducto);
+                renderItemsPedido();
+                document.getElementById('prod-nombre').value = '';
+                document.getElementById('prod-precio').value = '';
+                document.getElementById('prod-cantidad').value = 1;
+                actualizarBotonCrearPedido();
+            }
+        });
+
+        const renderItemsPedido = () => {
+            const lista = document.getElementById('lista-items-pedido');
+            lista.innerHTML = ''; // Limpiar la lista antes de renderizar
+
+            if (itemsPedido.length > 0) {
+                itemsPedido.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.cantidad} x ${item.nombre} - $${item.precio.toFixed(2)}`;
+                    lista.appendChild(li);
+                });
+                document.getElementById('productos-en-pedido').classList.remove('hidden');
+            } else {
+                 document.getElementById('productos-en-pedido').classList.add('hidden');
+            }
+        };
+
+        const actualizarBotonCrearPedido = () => {
+            const btnCrear = document.getElementById('btn-crear-pedido');
+            const nombreCliente = document.getElementById('nombre-cliente').value;
+            if (nombreCliente.trim() !== '' && itemsPedido.length > 0) {
+                btnCrear.disabled = false;
+                btnCrear.classList.remove('bg-zinc-700', 'text-zinc-500', 'cursor-not-allowed');
+                btnCrear.classList.add('bg-amber-500', 'text-zinc-900', 'hover-bg-amber-600');
+            } else {
+                btnCrear.disabled = true;
+                btnCrear.classList.remove('bg-amber-500', 'text-zinc-900', 'hover-bg-amber-600');
+                btnCrear.classList.add('bg-zinc-700', 'text-zinc-500', 'cursor-not-allowed');
+            }
+        };
+
+        document.getElementById('nombre-cliente').addEventListener('input', actualizarBotonCrearPedido);
+
+        document.getElementById('btn-crear-pedido').addEventListener('click', async () => {
+            const nombreCliente = document.getElementById('nombre-cliente').value;
+            if (nombreCliente && itemsPedido.length > 0) {
+                const totalPedido = itemsPedido.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+                const nuevoPedido = {
+                    cliente: nombreCliente,
+                    productos: itemsPedido,
+                    total: totalPedido,
+                    pagado: false,
+                    entregado: false,
+                    fecha: new Date().toISOString(),
+                };
+                
+                try {
+                    await addDoc(collection(db, 'pedidos_compartidos'), nuevoPedido);
+                    document.getElementById('nombre-cliente').value = '';
+                    itemsPedido = [];
+                    renderItemsPedido();
+                    actualizarBotonCrearPedido();
+                } catch (e) {
+                    console.error("Error al agregar pedido: ", e);
+                }
+            }
+        });
+
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const userIdText = document.getElementById('user-id').textContent;
+            navigator.clipboard.writeText(userIdText).then(() => {
+                console.log('ID de usuario copiado al portapapeles');
+            }).catch(err => {
+                console.error('Error al copiar el ID:', err);
+                // Fallback para navegadores que no soportan la API Clipboard
+                const tempInput = document.createElement('input');
+                tempInput.value = userIdText;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+            });
+        });
+
+        // Funciones globales para botones
+        window.marcarPagado = async (pedidoId, estadoActual) => {
+            if (db) {
+                try {
+                    const pedidoRef = doc(db, 'pedidos_compartidos', pedidoId);
+                    await updateDoc(pedidoRef, { pagado: !estadoActual });
+                } catch (e) {
+                    console.error("Error al actualizar estado 'pagado': ", e);
+                }
+            }
+        };
+
+        window.marcarEntregado = async (pedidoId, estadoActual) => {
+            if (db) {
+                try {
+                    const pedidoRef = doc(db, 'pedidos_compartidos', pedidoId);
+                    await updateDoc(pedidoRef, { entregado: !estadoActual });
+                } catch (e) {
+                    console.error("Error al actualizar estado 'entregado': ", e);
+                }
+            }
+        };
+
+        // Iniciar la aplicación cuando la ventana cargue
+        window.onload = initFirebase;
+    </script>
+
+</body>
+</html>
