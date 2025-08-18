@@ -42,11 +42,13 @@
         <div id="login-container" class="flex flex-col items-center justify-center min-h-screen">
             <div class="bg-zinc-800 p-8 rounded-2xl shadow-lg w-full max-w-sm">
                 <h1 class="text-4xl sm:text-5xl font-extrabold font-serif text-amber-400 text-center mb-4">
-                    SOL DE CITRINO
+                    <!-- Placeholder para el logo de la empresa -->
+                    <!-- Reemplaza "https://placehold.co/..." con la URL de tu logo -->
+                    <img id="login-logo" src="https://placehold.co/200x50/18181b/facc15?text=SOL+DE+CITRINO" alt="Logo de SOL DE CITRINO" class="mx-auto h-12">
                 </h1>
                 <p class="text-center text-zinc-300 mb-6">Inicia sesión para acceder al gestor de pedidos.</p>
                 <input id="email-input" type="email" placeholder="Correo electrónico" class="w-full px-4 py-3 rounded-lg bg-zinc-700 text-zinc-100 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-400 mb-4">
-                <input id="password-input" type="password" placeholder="Contraseña" class="w-full px-4 py-3 rounded-lg bg-zinc-700 text-zinc-100 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-400 mb-4">
+                <input id="password-input" type="password" placeholder="Contraseña" class="w-full px-4 py-3 rounded-lg bg-zinc-700 border-zinc-600 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-400 mb-4">
                 <button id="login-btn" class="w-full bg-amber-500 text-zinc-900 font-bold py-3 px-6 rounded-lg shadow-md hover:bg-amber-600 transition duration-300">
                     Iniciar Sesión
                 </button>
@@ -59,12 +61,12 @@
         <!-- Contenido principal de la aplicación (oculto por defecto) -->
         <div id="main-app-content" class="hidden">
             <header class="bg-zinc-800 rounded-2xl shadow-lg p-6 text-center">
+                <!-- Reemplazo del texto con un placeholder del logo -->
+                <!-- Reemplaza "https://placehold.co/..." con la URL de tu logo -->
+                <img id="main-logo" src="https://placehold.co/200x50/18181b/facc15?text=SOL+DE+CITRINO" alt="Logo de SOL DE CITRINO" class="mx-auto h-12 mb-2">
                 <h1 class="text-4xl sm:text-5xl font-extrabold font-serif text-amber-400">
                     Gestor de Pedidos
                 </h1>
-                <h2 class="text-xl sm:text-2xl font-bold font-serif text-amber-400 mb-2">
-                    SOL DE CITRINO
-                </h2>
                 <p class="text-zinc-400 text-xs sm:text-sm flex items-center justify-center gap-2">
                     ID de Usuario: <span id="user-id" class="font-mono break-all">Cargando...</span>
                     <button id="copy-btn" class="text-amber-400 hover:text-amber-500 focus:outline-none" title="Copiar ID de Usuario">
@@ -175,7 +177,7 @@
         // Reemplaza los valores con la configuración de tu propio proyecto de Firebase.
         // Puedes encontrarla en la Consola de Firebase > Configuración del proyecto.
         // =================================================================
-       const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyA222Jgj6QZVJkweieKdfx1yNdbdlIN9hU",
   authDomain: "sol-de-citrino-9147e.firebaseapp.com",
   projectId: "sol-de-citrino-9147e",
@@ -460,6 +462,7 @@
             
             renderItemsPedido();
             actualizarBotonCrearPedido();
+            document.getElementById('cargar-pedido-titulo').scrollIntoView({ behavior: 'smooth' });
         };
 
         const handleCancelarEdicion = () => {
