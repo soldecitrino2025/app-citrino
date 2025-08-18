@@ -175,7 +175,6 @@
         // Reemplaza los valores con la configuración de tu propio proyecto de Firebase.
         // Puedes encontrarla en la Consola de Firebase > Configuración del proyecto.
         // =================================================================
-        const firebaseConfig = {
        const firebaseConfig = {
   apiKey: "AIzaSyA222Jgj6QZVJkweieKdfx1yNdbdlIN9hU",
   authDomain: "sol-de-citrino-9147e.firebaseapp.com",
@@ -302,15 +301,17 @@
                         </li>
                     `;
                 } else {
-                    const productosHTML = pedido.productos.map(prod => `
-                        <li>${prod.cantidad} x ${prod.nombre} ($${prod.precio.toFixed(2)})</li>
+                    const productosHTML = pedido.productos.map((prod, index) => `
+                        <li class="flex justify-between items-center text-sm text-zinc-300">
+                            <span>${prod.cantidad} x ${prod.nombre} ($${prod.precio.toFixed(2)})</span>
+                        </li>
                     `).join('');
 
                     pedidosPendientesHTML += `
                         <li class="bg-zinc-700 rounded-lg p-4 shadow-sm border border-zinc-600">
                             <p class="text-lg font-bold text-zinc-100">Cliente: ${pedido.cliente}</p>
                             <p class="text-sm text-zinc-400">Total: $${pedido.total.toFixed(2)}</p>
-                            <ul class="list-disc list-inside mt-2 text-sm text-zinc-300">
+                            <ul class="list-disc list-inside mt-2 text-sm text-zinc-300 space-y-1">
                                 ${productosHTML}
                             </ul>
                             <div class="flex flex-col sm:flex-row gap-2 mt-4">
@@ -337,6 +338,15 @@
             pendientesContainer.innerHTML = pedidosPendientesHTML || '<p class="text-center text-zinc-500 italic">No hay pedidos pendientes.</p>';
             completadosContainer.innerHTML = pedidosCompletadosHTML || '<p class="text-center text-zinc-500 italic">No hay pedidos completados.</p>';
             totalVentasEl.textContent = `$${totalVentas.toFixed(2)}`;
+        };
+
+        // NEW: Function to remove a product from the current editing list
+        const handleEliminarProducto = (index) => {
+            if (itemsPedido.length > 0 && index >= 0) {
+                itemsPedido.splice(index, 1);
+                renderItemsPedido(); // Re-render the list after removing the item
+                actualizarBotonCrearPedido();
+            }
         };
 
         const handleAgregarProducto = () => {
@@ -369,9 +379,16 @@
             lista.innerHTML = '';
 
             if (itemsPedido.length > 0) {
-                itemsPedido.forEach(item => {
+                itemsPedido.forEach((item, index) => {
+                    // Added a delete button for each product
                     const li = document.createElement('li');
-                    li.textContent = `${item.cantidad} x ${item.nombre} - $${item.precio.toFixed(2)}`;
+                    li.classList.add('flex', 'justify-between', 'items-center', 'text-zinc-200');
+                    li.innerHTML = `
+                        <span>${item.cantidad} x ${item.nombre} - $${item.precio.toFixed(2)}</span>
+                        <button onclick="handleEliminarProducto(${index})" class="text-red-400 hover:text-red-600 transition duration-300 text-sm ml-2">
+                            x
+                        </button>
+                    `;
                     lista.appendChild(li);
                 });
                 document.getElementById('productos-en-pedido').classList.remove('hidden');
@@ -524,6 +541,7 @@
             window.marcarEntregado = marcarEntregado;
             window.handleEditarPedido = handleEditarPedido;
             window.handleEliminarPedido = handleEliminarPedido;
+            window.handleEliminarProducto = handleEliminarProducto;
         };
 
     </script>
