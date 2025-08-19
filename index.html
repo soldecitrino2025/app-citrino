@@ -101,27 +101,6 @@
             <!-- Secciones de la aplicación -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
-                <!-- Columna de Lista de Productos -->
-                <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 space-y-6" id="product-list-section">
-                    <h2 class="text-2xl font-bold font-serif text-zinc-100 border-b-2 border-zinc-700 pb-2">
-                        Lista de Productos
-                    </h2>
-                    <div class="space-y-4">
-                        <h3 class="text-xl font-semibold text-zinc-200">Añadir/Editar Producto</h3>
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <input id="new-prod-nombre" type="text" placeholder="Producto" class="w-full sm:w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
-                            <input id="new-prod-costo" type="number" placeholder="Precio de Costo" class="w-full sm:w-1/4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
-                            <input id="new-prod-venta" type="number" placeholder="Precio de Venta" class="w-full sm:w-1/4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
-                        </div>
-                        <button id="btn-agregar-producto-lista" class="w-full bg-amber-500 text-zinc-900 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-amber-600 transition duration-300">
-                            + Agregar a la Lista
-                        </button>
-                    </div>
-                    <div id="lista-productos-maestra-container" class="space-y-2 p-4 bg-zinc-700 rounded-lg border border-zinc-600 min-h-[100px]">
-                        <p class="text-center text-zinc-500 italic">No hay productos en la lista.</p>
-                    </div>
-                </div>
-
                 <!-- Columna de Cargar Pedido -->
                 <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 space-y-6" id="order-form-section">
                     <h2 id="cargar-pedido-titulo" class="text-2xl font-bold font-serif text-zinc-100 border-b-2 border-zinc-700 pb-2">
@@ -140,10 +119,9 @@
                     <div class="space-y-4">
                         <h3 class="text-xl font-semibold text-zinc-200">Agregar Productos</h3>
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <input id="prod-nombre" type="text" placeholder="Producto" list="productos-existentes" class="w-full sm:w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
-                            <datalist id="productos-existentes"></datalist>
+                            <input id="prod-nombre" type="text" placeholder="Producto" class="w-full sm:w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
+                            <input id="prod-precio" type="number" placeholder="Precio" class="w-full sm:w-1/4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
                             <input id="prod-cantidad" type="number" placeholder="Cantidad" value="1" min="1" class="w-full sm:w-1/4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400">
-                            <input id="prod-precio" type="number" placeholder="Precio" class="w-full sm:w-1/4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-zinc-700 border-zinc-600 text-zinc-100 focus:ring-amber-400" disabled>
                         </div>
                         <button id="btn-agregar-producto" class="w-full bg-amber-500 text-zinc-900 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-amber-600 transition duration-300">
                             + Agregar a la lista
@@ -220,9 +198,7 @@ const firebaseConfig = {
         let db, auth;
         let userId = null;
         let itemsPedido = [];
-        let productosExistentes = {};
         let pedidoEnEdicionId = null; // Variable para saber si estamos editando un pedido
-        let listaProductosMaestra = {}; // Nuevo objeto para la lista de productos maestra
 
         // Función para mostrar el mensaje de error
         const showError = (message) => {
@@ -276,24 +252,6 @@ const firebaseConfig = {
 
         // Escuchar cambios en ambas bases de datos en tiempo real
         const setupRealtimeListeners = () => {
-            // Listener para los productos
-            const productosRef = collection(db, 'lista_de_productos');
-            onSnapshot(productosRef, (snapshot) => {
-                const productosData = {};
-                snapshot.docs.forEach(doc => {
-                    const data = doc.data();
-                    productosData[data.nombre] = {
-                        precioCosto: data.precioCosto,
-                        precioVenta: data.precioVenta
-                    };
-                });
-                listaProductosMaestra = productosData;
-                renderProductosExistentes();
-                renderListaProductos();
-            }, (error) => {
-                console.error("Error al escuchar la lista de productos:", error);
-            });
-
             // Listener para los pedidos
             const pedidosRef = collection(db, 'pedidos_compartidos');
             onSnapshot(pedidosRef, (snapshot) => {
@@ -307,33 +265,6 @@ const firebaseConfig = {
             });
         };
 
-        // Renderizar la lista maestra de productos en la UI
-        const renderListaProductos = () => {
-            const container = document.getElementById('lista-productos-maestra-container');
-            let html = '<ul class="space-y-1">';
-            for (const nombre in listaProductosMaestra) {
-                const prod = listaProductosMaestra[nombre];
-                html += `
-                    <li class="flex justify-between items-center text-zinc-300">
-                        <span>${nombre} - Costo: $${prod.precioCosto.toFixed(2)}, Venta: $${prod.precioVenta.toFixed(2)}</span>
-                    </li>
-                `;
-            }
-            html += '</ul>';
-            container.innerHTML = html || '<p class="text-center text-zinc-500 italic">No hay productos en la lista.</p>';
-        };
-
-        // Renderizar los productos existentes en la lista de autocompletado
-        const renderProductosExistentes = () => {
-            const datalist = document.getElementById('productos-existentes');
-            datalist.innerHTML = '';
-            for (const nombre in listaProductosMaestra) {
-                const option = document.createElement('option');
-                option.value = nombre;
-                datalist.appendChild(option);
-            }
-        };
-
         // Renderizar los pedidos en la UI
         const renderPedidos = (pedidos) => {
             const pendientesContainer = document.getElementById('pedidos-pendientes-container');
@@ -344,24 +275,16 @@ const firebaseConfig = {
             let pedidosPendientesHTML = '';
             let pedidosCompletadosHTML = '';
             let totalVentas = 0;
-            let totalGanancias = 0;
+            let totalGanancias = 0; // Ganancias ya no se calcula
 
             pedidos.forEach(pedido => {
                 if (pedido.pagado && pedido.entregado) {
                     totalVentas += pedido.total;
-                    // Calcular la ganancia de este pedido
-                    const gananciaPedido = pedido.productos.reduce((sum, item) => {
-                        const prodData = listaProductosMaestra[item.nombre];
-                        // Si el producto está en la lista maestra, se usa el precio de costo para calcular la ganancia
-                        return sum + (prodData ? (item.precio - prodData.precioCosto) * item.cantidad : 0);
-                    }, 0);
-                    totalGanancias += gananciaPedido;
 
                     pedidosCompletadosHTML += `
                         <li class="bg-amber-500/10 rounded-lg p-4 shadow-sm border border-amber-500/20">
                             <p class="text-lg font-bold text-amber-400">Cliente: ${pedido.cliente}</p>
                             <p class="text-sm text-zinc-300">Total: $${pedido.total.toFixed(2)}</p>
-                            <p class="text-sm text-emerald-400">Ganancia: $${gananciaPedido.toFixed(2)}</p>
                             <p class="text-xs text-zinc-500 mt-1">
                                 Completado el: ${new Date(pedido.fecha).toLocaleDateString()}
                             </p>
@@ -411,48 +334,23 @@ const firebaseConfig = {
             totalGananciasEl.textContent = `$${totalGanancias.toFixed(2)}`;
         };
 
-        const handleAgregarProductoALista = async () => {
-            const nombre = document.getElementById('new-prod-nombre').value;
-            const costo = document.getElementById('new-prod-costo').value;
-            const venta = document.getElementById('new-prod-venta').value;
-
-            if (nombre && costo && venta) {
-                const nuevoProducto = {
-                    nombre: nombre,
-                    precioCosto: parseFloat(costo),
-                    precioVenta: parseFloat(venta)
-                };
-
-                try {
-                    await addDoc(collection(db, 'lista_de_productos'), nuevoProducto);
-                    document.getElementById('new-prod-nombre').value = '';
-                    document.getElementById('new-prod-costo').value = '';
-                    document.getElementById('new-prod-venta').value = '';
-                } catch (e) {
-                    console.error("Error al agregar producto a la lista:", e);
-                }
-            }
-        };
-
         const handleAgregarProducto = () => {
             const nombre = document.getElementById('prod-nombre').value;
+            const precio = document.getElementById('prod-precio').value;
             const cantidad = document.getElementById('prod-cantidad').value;
 
-            if (nombre && cantidad > 0) {
-                const prod = listaProductosMaestra[nombre];
-                if (prod) {
-                    const nuevoProducto = {
-                        nombre: nombre,
-                        precio: prod.precioVenta,
-                        costo: prod.precioCosto, 
-                        cantidad: parseInt(cantidad),
-                    };
-                    itemsPedido.push(nuevoProducto);
-                    renderItemsPedido();
-                    document.getElementById('prod-nombre').value = '';
-                    document.getElementById('prod-cantidad').value = 1;
-                    actualizarBotonCrearPedido();
-                }
+            if (nombre && precio && cantidad > 0) {
+                const nuevoProducto = {
+                    nombre: nombre,
+                    precio: parseFloat(precio),
+                    cantidad: parseInt(cantidad),
+                };
+                itemsPedido.push(nuevoProducto);
+                renderItemsPedido();
+                document.getElementById('prod-nombre').value = '';
+                document.getElementById('prod-precio').value = '';
+                document.getElementById('prod-cantidad').value = 1;
+                actualizarBotonCrearPedido();
             }
         };
 
@@ -628,13 +526,11 @@ const firebaseConfig = {
             document.getElementById('btn-cancelar-edicion').addEventListener('click', handleCancelarEdicion);
             document.getElementById('copy-btn').addEventListener('click', handleCopy);
             document.getElementById('prod-nombre').addEventListener('input', handleProdNameInput);
-            document.getElementById('btn-agregar-producto-lista').addEventListener('click', handleAgregarProductoALista);
 
             window.marcarPagado = marcarPagado;
             window.marcarEntregado = marcarEntregado;
             window.handleEditarPedido = handleEditarPedido;
             window.handleEliminarPedido = handleEliminarPedido;
-            window.handleEliminarProducto = handleEliminarProducto;
         };
 
     </script>
