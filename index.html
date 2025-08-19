@@ -32,6 +32,26 @@
         .ring-amber-400 { --tw-ring-color: #facc15; }
         .bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.1); }
         .border-amber-500\/20 { border-color: rgba(245, 158, 11, 0.2); }
+
+        /* Estilo para la barra de desplazamiento en los contenedores de pedidos */
+        .scrollable-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .scrollable-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scrollable-list::-webkit-scrollbar-track {
+            background: #27272a;
+            border-radius: 10px;
+        }
+        .scrollable-list::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 10px;
+        }
+        .scrollable-list::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
 </head>
 <body class="bg-zinc-900 text-zinc-100 antialiased">
@@ -78,24 +98,14 @@
                 </p>
             </header>
 
-            <!-- Sección de Total de Ventas y Ganancias Netas -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
-                <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 text-center border-l-4 border-amber-400">
-                    <h2 class="text-xl sm:text-2xl font-bold font-serif text-zinc-100">
-                        Monto Total de Ventas
-                    </h2>
-                    <p id="total-ventas" class="text-3xl sm:text-4xl font-extrabold text-amber-400 mt-2">
-                        $0.00
-                    </p>
-                </div>
-                <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 text-center border-l-4 border-emerald-400">
-                    <h2 class="text-xl sm:text-2xl font-bold font-serif text-zinc-100">
-                        Ganancias Netas
-                    </h2>
-                    <p id="total-ganancias" class="text-3xl sm:text-4xl font-extrabold text-emerald-400 mt-2">
-                        $0.00
-                    </p>
-                </div>
+            <!-- Sección de Monto Total de Ventas (Ganancias eliminada) -->
+            <div class="bg-zinc-800 rounded-2xl shadow-lg p-6 text-center border-l-4 border-amber-400 mb-8">
+                <h2 class="text-xl sm:text-2xl font-bold font-serif text-zinc-100">
+                    Monto Total de Ventas
+                </h2>
+                <p id="total-ventas" class="text-3xl sm:text-4xl font-extrabold text-amber-400 mt-2">
+                    $0.00
+                </p>
             </div>
 
             <!-- Secciones de la aplicación -->
@@ -152,7 +162,7 @@
                     <h2 class="text-2xl font-bold font-serif text-zinc-100 border-b-2 border-zinc-700 pb-2">
                         Pedidos Pendientes
                     </h2>
-                    <div id="pedidos-pendientes-container">
+                    <div id="pedidos-pendientes-container" class="scrollable-list">
                         <p class="text-center text-zinc-500 italic">No hay pedidos pendientes.</p>
                     </div>
                 </div>
@@ -162,7 +172,7 @@
                     <h2 class="text-2xl font-bold font-serif text-zinc-100 border-b-2 border-zinc-700 pb-2">
                         Historial de Pedidos
                     </h2>
-                    <div id="pedidos-completados-container">
+                    <div id="pedidos-completados-container" class="scrollable-list">
                         <p class="text-center text-zinc-500 italic">No hay pedidos completados.</p>
                     </div>
                 </div>
@@ -238,7 +248,7 @@ const firebaseConfig = {
                 
                 userId = user.uid;
                 document.getElementById('user-id').textContent = userId;
-                setupRealtimeListeners(); // Llamada a los nuevos listeners
+                setupRealtimeListener(); // Llamada a los nuevos listeners
 
             } catch (error) {
                 console.error("Error al iniciar sesión:", error);
@@ -251,7 +261,7 @@ const firebaseConfig = {
         };
 
         // Escuchar cambios en ambas bases de datos en tiempo real
-        const setupRealtimeListeners = () => {
+        const setupRealtimeListener = () => {
             // Listener para los pedidos
             const pedidosRef = collection(db, 'pedidos_compartidos');
             onSnapshot(pedidosRef, (snapshot) => {
@@ -270,17 +280,14 @@ const firebaseConfig = {
             const pendientesContainer = document.getElementById('pedidos-pendientes-container');
             const completadosContainer = document.getElementById('pedidos-completados-container');
             const totalVentasEl = document.getElementById('total-ventas');
-            const totalGananciasEl = document.getElementById('total-ganancias');
-
+            
             let pedidosPendientesHTML = '';
             let pedidosCompletadosHTML = '';
             let totalVentas = 0;
-            let totalGanancias = 0; // Ganancias ya no se calcula
 
             pedidos.forEach(pedido => {
                 if (pedido.pagado && pedido.entregado) {
                     totalVentas += pedido.total;
-
                     pedidosCompletadosHTML += `
                         <li class="bg-amber-500/10 rounded-lg p-4 shadow-sm border border-amber-500/20">
                             <p class="text-lg font-bold text-amber-400">Cliente: ${pedido.cliente}</p>
@@ -331,7 +338,6 @@ const firebaseConfig = {
             pendientesContainer.innerHTML = pedidosPendientesHTML || '<p class="text-center text-zinc-500 italic">No hay pedidos pendientes.</p>';
             completadosContainer.innerHTML = pedidosCompletadosHTML || '<p class="text-center text-zinc-500 italic">No hay pedidos completados.</p>';
             totalVentasEl.textContent = `$${totalVentas.toFixed(2)}`;
-            totalGananciasEl.textContent = `$${totalGanancias.toFixed(2)}`;
         };
 
         const handleAgregarProducto = () => {
@@ -508,13 +514,9 @@ const firebaseConfig = {
             }
         };
         
-        const handleProdNameInput = (event) => {
+        window.handleProdNameInput = (event) => {
             const nombreProducto = event.target.value;
-            if (listaProductosMaestra[nombreProducto]) {
-                document.getElementById('prod-precio').value = listaProductosMaestra[nombreProducto].precioVenta;
-            } else {
-                document.getElementById('prod-precio').value = ''; // Clear price if product not found
-            }
+            // No se puede autocompletar el precio si no hay una lista maestra de productos
         };
 
         window.onload = () => {
@@ -531,6 +533,7 @@ const firebaseConfig = {
             window.marcarEntregado = marcarEntregado;
             window.handleEditarPedido = handleEditarPedido;
             window.handleEliminarPedido = handleEliminarPedido;
+            window.handleEliminarProducto = handleEliminarProducto;
         };
 
     </script>
