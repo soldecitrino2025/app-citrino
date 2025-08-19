@@ -514,7 +514,7 @@ const firebaseConfig = {
             }
         };
         
-        window.handleProdNameInput = (event) => {
+        const handleProdNameInput = (event) => {
             const nombreProducto = event.target.value;
             // No se puede autocompletar el precio si no hay una lista maestra de productos
         };
@@ -533,7 +533,6 @@ const firebaseConfig = {
             window.marcarEntregado = marcarEntregado;
             window.handleEditarPedido = handleEditarPedido;
             window.handleEliminarPedido = handleEliminarPedido;
-            window.handleEliminarProducto = handleEliminarProducto;
         };
 
     </script>
