@@ -208,7 +208,7 @@
         // Reemplaza los valores con la configuración de tu propio proyecto de Firebase.
         // Puedes encontrarla en la Consola de Firebase > Configuración del proyecto.
         // =================================================================
-           const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyA222Jgj6QZVJkweieKdfx1yNdbdlIN9hU",
   authDomain: "sol-de-citrino-9147e.firebaseapp.com",
   projectId: "sol-de-citrino-9147e",
@@ -411,7 +411,6 @@
             totalGananciasEl.textContent = `$${totalGanancias.toFixed(2)}`;
         };
 
-        // NEW: Function to add a new product to the master list
         const handleAgregarProductoALista = async () => {
             const nombre = document.getElementById('new-prod-nombre').value;
             const costo = document.getElementById('new-prod-costo').value;
@@ -445,7 +444,7 @@
                     const nuevoProducto = {
                         nombre: nombre,
                         precio: prod.precioVenta,
-                        costo: prod.precioCosto, // Guardar el precio de costo para el cálculo de ganancias
+                        costo: prod.precioCosto, 
                         cantidad: parseInt(cantidad),
                     };
                     itemsPedido.push(nuevoProducto);
@@ -635,6 +634,7 @@
             window.marcarEntregado = marcarEntregado;
             window.handleEditarPedido = handleEditarPedido;
             window.handleEliminarPedido = handleEliminarPedido;
+            window.handleEliminarProducto = handleEliminarProducto;
         };
 
     </script>
